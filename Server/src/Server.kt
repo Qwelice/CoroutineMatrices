@@ -37,8 +37,9 @@ class Server(port: Int) : SignalAdapter {
     }
 
     private suspend fun startConnectionReceive() = GlobalScope.launch{
-        println("[SERVER_RECEIVE]: Receive coroutine is starting")
+        println("[SERVER_RECEIVE]: Receive coroutine is starting...")
         while(!stop){
+            println("[SERVER_RECEIVE]: Waiting for new accepted connection...")
             val sio = connections.receive()
             println("[SERVER_RECEIVE]: New connection received!")
             val ji = launch { sio.startInput() }
@@ -63,6 +64,6 @@ class Server(port: Int) : SignalAdapter {
     /**
      * Handling input signals */
     override suspend fun inputSignal(signal: Signal, sio: SocketIO) {
-        
+
     }
 }
