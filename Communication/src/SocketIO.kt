@@ -16,6 +16,13 @@ class SocketIO (private val adapter: SignalAdapter, input: InputStream, output: 
         signals.send(data)
     }
 
+    suspend fun startInput(){
+        input.start()
+    }
+
+    suspend fun startOutput(){
+        output.start()
+    }
 
     private inner class AsyncInput(inputStream: InputStream) : AsyncStream(inputStream){
         private val stream = try{
