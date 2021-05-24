@@ -1,6 +1,7 @@
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withContext
+import signals.InnerSocketDisconnect
 import signals.Signal
 import java.io.*
 import java.util.concurrent.Executors
@@ -42,7 +43,8 @@ class SocketIO (private val adapter: SignalAdapter, input: InputStream, output: 
                     }
                 }catch (ex: IOException){
                     println(ex.message)
-                    break
+                    signals.send(InnerSocketDisconnect())
+                    stop()
                 }
             }
         }
@@ -63,6 +65,9 @@ class SocketIO (private val adapter: SignalAdapter, input: InputStream, output: 
             while(!stopped){
                 try{
                     val signal = signals.receive()
+                    if(signal is InnerSocketDisconnect){
+                        throw IOException("Inner disconnect has been caught")
+                    }
                     if (stream != null) {
                         signal.toBytesStream(stream)
                     }else{
@@ -70,7 +75,7 @@ class SocketIO (private val adapter: SignalAdapter, input: InputStream, output: 
                     }
                 }catch (ex: IOException){
                     println(ex.message)
-                    break
+                    stop()
                 }
             }
         }
