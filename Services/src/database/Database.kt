@@ -4,6 +4,7 @@ import com.ibatis.common.jdbc.ScriptRunner
 import java.io.BufferedReader
 import java.io.FileReader
 import java.io.IOException
+import java.lang.StringBuilder
 import java.sql.Connection
 import java.sql.SQLException
 
@@ -55,20 +56,22 @@ abstract class Database {
      * @param sql запрос
      * @return результат запроса
      */
-    fun executeQuery(sql: String?): String? {
+    fun executeQuery(sql: String): String? {
         return try {
             if (!isConnected) {
                 connection = getConnection()
             }
             val st = connection?.createStatement()
             val rs = st?.executeQuery(sql)
-            val sb = StringBuilder()
             val columnsCount = rs?.metaData?.columnCount ?: throw SQLException()
+            val lst = ArrayList<String>()
+            val sb = StringBuilder()
             while (rs.next()) {
+                lst.clear()
                 for (i in 1..columnsCount) {
-                    sb.append(rs.getString(i))
+                    lst.add(rs.getString(i))
                 }
-                sb.append('\n')
+                sb.append(lst.joinToString(";")).append('\n')
             }
             sb.toString()
         } catch (ex: SQLException) {
