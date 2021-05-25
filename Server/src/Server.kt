@@ -36,7 +36,7 @@ class Server(port: Int) : SignalAdapter {
         }
     }
 
-    private suspend fun startConnectionReceive() = GlobalScope.launch{
+    private suspend fun startConnectionReceive() = GlobalScope.launch(Dispatchers.IO){
         println("[SERVER_RECEIVE]: Receive coroutine is starting...")
         while(!stop){
             println("[SERVER_RECEIVE]: Waiting for new accepted connection...")
