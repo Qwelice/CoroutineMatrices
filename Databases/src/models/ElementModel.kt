@@ -15,7 +15,7 @@ class ElementModel(id: String, i: Int, j: Int, elValue: Double) : BaseModel() {
         get() = attributes["row"] as Int
 
     val j: Int
-        get() =  attributes["columns"] as Int
+        get() =  attributes["column"] as Int
 
     val element: Double
         get() = attributes["value"] as Double

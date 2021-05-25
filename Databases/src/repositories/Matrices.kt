@@ -1,5 +1,6 @@
 package repositories
 
+import com.google.gson.JsonArray
 import models.BaseModel
 import models.MatrixModel
 import utils.params.HyperParameter
@@ -7,6 +8,22 @@ import utils.params.MatrixId
 import java.sql.SQLException
 
 class Matrices : BaseRepository() {
+
+    fun getAllMatrices() : JsonArray{
+        val array = JsonArray()
+        try {
+            val conn = getConnection()
+            conn.createStatement().apply {
+                val rs = executeQuery("SELECT `id` FROM `matrix_db`.matrices")
+                while(rs.next()){
+                    array.add(rs.getString("id"))
+                }
+            }
+        }catch (ignore: SQLException){
+
+        }
+        return array
+    }
 
     fun getMatrix(matrixName: String) : MatrixModel? {
         val m = getEntry(MatrixId(matrixName))
@@ -16,6 +33,14 @@ class Matrices : BaseRepository() {
     operator fun get(matrixName: String) : MatrixModel?{
         val m = getEntry(MatrixId(matrixName))
         return m as MatrixModel?
+    }
+
+    fun addMatrix(matrixName: String, rows: Int, columns: Int){
+        createEntry(MatrixModel(matrixName, rows, columns))
+    }
+
+    fun setMatrix(matrixName: String, rows: Int, columns: Int){
+        updateEntry(MatrixModel(matrixName, rows, columns))
     }
 
     override fun createEntry(model: BaseModel) {

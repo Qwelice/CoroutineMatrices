@@ -1,11 +1,15 @@
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import services.MatrixService
 import signals.Signal
+import signals.SignalMatrixList
+import signals.SignalNewMatrix
 import java.io.IOException
 import java.net.ServerSocket
 import java.util.concurrent.Executors
 
 class Server(port: Int) : SignalAdapter {
+    private val services = HashMap<String, Any>()
     private val coroutines = HashMap<String, Job>()
     private val connections = Channel<SocketIO>()
     private val connected = HashMap<SocketIO, Pair<Job, Job>>()
@@ -15,6 +19,7 @@ class Server(port: Int) : SignalAdapter {
     init {
         runBlocking {
             println("[SERVER_GLOBAL]: All is starting...")
+            services["matrices"] = MatrixService()
             coroutines["accept"] = launch { startClientAcceptance() }
             coroutines["receive"] = startConnectionReceive()
             println("[SERVER_GLOBAL]: Started successfully")
@@ -45,6 +50,7 @@ class Server(port: Int) : SignalAdapter {
             val ji = launch { sio.startInput() }
             val jo = launch { sio.startOutput() }
             connected[sio] = Pair(ji, jo)
+            sio.sendData((services["matrices"] as MatrixService).getMatrixList())
         }
     }
 
@@ -64,6 +70,12 @@ class Server(port: Int) : SignalAdapter {
     /**
      * Handling input signals */
     override suspend fun inputSignal(signal: Signal, sio: SocketIO) {
-
+        when(signal.getType()){
+            "NewMatrix" -> {
+                val ser = services["matrices"] as MatrixService
+                ser.appendMatrix(signal as SignalNewMatrix)
+                sio.sendData(ser.getMatrixList())
+            }
+        }
     }
 }

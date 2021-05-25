@@ -1,5 +1,6 @@
 package signals
 
+import com.google.gson.JsonElement
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -8,7 +9,7 @@ import java.io.Serializable
 /**
  * Транспортная единица данных
  * */
-abstract class Signal : Serializable {
+abstract class Signal  : Serializable {
     companion object{
         fun fromBytesStream(stream: ObjectInputStream) : Signal {
             try{
