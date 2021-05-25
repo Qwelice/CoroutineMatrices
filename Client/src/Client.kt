@@ -1,16 +1,10 @@
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import signals.Signal
 import signals.SignalMatrixList
-import signals.SignalNewMatrix
 import java.io.IOException
 import java.net.Socket
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class Client : SignalAdapter {
     private var cSocket: Socket? = null

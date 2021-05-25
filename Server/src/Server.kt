@@ -2,7 +2,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import services.MatrixService
 import signals.Signal
-import signals.SignalMatrixList
 import signals.SignalNewMatrix
 import java.io.IOException
 import java.net.ServerSocket
