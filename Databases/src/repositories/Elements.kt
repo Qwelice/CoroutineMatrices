@@ -58,8 +58,8 @@ class Elements : BaseRepository() {
             val conn = getConnection()
             conn.createStatement().apply {
                 val rs = executeQuery("SELECT COUNT(`j`) AS count FROM `matrix_db`.matrix_elements " +
-                            "WHERE `matrix_id` = $matrixName AND `i` = $byRow")
-                rs.first()
+                            "WHERE `matrix_id` = '$matrixName' AND `i` = '$byRow'")
+                rs.next()
                 return rs.getInt("count")
             }
         }catch (ex: SQLException){
@@ -72,8 +72,8 @@ class Elements : BaseRepository() {
             val conn = getConnection()
             conn.createStatement().apply {
                 val rs = executeQuery("SELECT COUNT(`i`) AS count FROM `matrix_db`.matrix_elements " +
-                            "WHERE `matrix_id` = $matrixName AND `j` = $byColumn")
-                rs.first()
+                            "WHERE `matrix_id` = '$matrixName' AND `j` = '$byColumn'")
+                rs.next()
                 return rs.getInt("count")
             }
         }catch (ex: SQLException){
@@ -100,8 +100,8 @@ class Elements : BaseRepository() {
             val conn = getConnection()
             conn.createStatement().apply {
                 val rs = executeQuery("SELECT `element_value` FROM `matrix_db`.matrix_elements " +
-                        "WHERE matrix_id = ${p.id} AND i = ${p.row} AND j = ${p.column}")
-                rs.first()
+                        "WHERE matrix_id = '${p.id}' AND i = '${p.row}' AND j = '${p.column}'")
+                rs.next()
                 val value = rs.getDouble("element_value")
                 return ElementModel(p.id, p.row, p.column, value)
             }
@@ -116,8 +116,8 @@ class Elements : BaseRepository() {
             val conn = getConnection()
             conn.createStatement().apply {
                 executeUpdate("UPDATE `matrix_db`.matrix_elements " +
-                        "WHERE matrix_id = ${m.matrixId} AND i = ${m.i} AND j = ${m.j}" +
-                        " SET element_value = ${m.element}")
+                        "WHERE matrix_id = '${m.matrixId}' AND i = '${m.i}' AND j = '${m.j}'" +
+                        " SET element_value = '${m.element}'")
             }
         }catch (ignore: SQLException){
 

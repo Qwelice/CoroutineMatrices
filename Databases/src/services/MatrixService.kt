@@ -1,6 +1,7 @@
 package services
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonParser
 import repositories.Elements
 import repositories.Matrices
@@ -11,7 +12,7 @@ class MatrixService {
     private val elements = Elements()
     private val matrices = Matrices()
 
-    suspend fun appendMatrix(signal: SignalNewMatrix){
+    fun appendMatrix(signal: SignalNewMatrix){
         val s = JsonParser.parseString(signal.fullMatrix).asJsonObject
         val ms = matrices.getAllMatrices()
         if(!ms.contains(s["id"])){
@@ -20,14 +21,22 @@ class MatrixService {
             val columns = s["columns"].asInt
             val data = s["data"].asJsonArray
             matrices.addMatrix(name, rows, columns)
-            for(i in 0 until rows){
-                for(j in 0 until columns){
-                    val elem = data[i].asJsonArray[j].asDouble
-                    elements.addElement(name, i, j, elem)
+            if(data.size() > 0){
+                for(i in 0 until rows){
+                    for(j in 0 until columns){
+                        val elem = data[i].asJsonArray[j].asDouble
+                        elements.addElement(name, i, j, elem)
+                    }
                 }
             }
         }
     }
 
-    suspend fun getMatrixList() : SignalMatrixList = SignalMatrixList(matrices.getAllMatrices().toString())
+    fun getMatrixList() : SignalMatrixList = SignalMatrixList(matrices.getAllMatrices().toString())
+    fun getByRow(matrixName: String, row: Int) = elements.getByRow(matrixName, row)
+    fun getByColumn(matrixName: String, column: Int) = elements.getByColumn(matrixName, column)
+    fun getMatrix(matrixName: String) = matrices.getMatrix(matrixName)
+    fun appendElement(matrixName: String, i: Int, j: Int, value: Double){
+        elements.addElement(matrixName, i, j, value)
+    }
 }

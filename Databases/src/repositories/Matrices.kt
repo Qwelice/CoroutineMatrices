@@ -62,8 +62,8 @@ class Matrices : BaseRepository() {
             val conn = getConnection()
             conn.createStatement().apply {
                 val rs = this.executeQuery("SELECT `id`, `matrix_rows`, `matrix_columns`" +
-                        " FROM `matrix_db`.`matrices` WHERE `id` = ${p.id}")
-                rs.first() // <- move to first entry, cause there is necessary data
+                        " FROM `matrix_db`.`matrices` WHERE `id` = '${p.id}'")
+                rs.next()
                 val id = rs.getString(1)
                 val rows = rs.getInt(2)
                 val columns = rs.getInt(3)
