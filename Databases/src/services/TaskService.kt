@@ -26,15 +26,19 @@ class TaskService(private val adapter: TaskAdapter){
         val mutex = Mutex()
         mutex.withLock {
             val tp = tasks[taskId]
-            tp!!.appendAnswer(answer)
-            val result = tp.summarizeTask()
-            adapter.inputAnswer(tp, result)
-            tp.updateProgress()
-            if(!tp.task.finished){
-                adapter.inputPromotion(tp, taskId)
-            }else{
-                adapter.inputReady(taskId)
-                tasks.remove(taskId)
+            if(tp != null){
+                tp.appendAnswer(answer)
+                try{
+                    val result = tp.summarizeTask()
+                    adapter.inputAnswer(tp, result)
+                    tp.updateProgress()
+                }catch (ignore: Exception){}
+                if(!tp.task.finished){
+                    adapter.inputPromotion(tp, taskId)
+                }else{
+                    adapter.inputReady(taskId)
+                    tasks.remove(taskId)
+                }
             }
         }
     }

@@ -5,15 +5,20 @@ import models.BaseModel
 import models.MatrixModel
 import utils.params.HyperParameter
 import utils.params.MatrixId
+import java.sql.Connection
 import java.sql.SQLException
 
 class Matrices : BaseRepository() {
 
+    private var conn: Connection? = null
+
     fun getAllMatrices() : JsonArray{
         val array = JsonArray()
         try {
-            val conn = getConnection()
-            conn.createStatement().apply {
+            if(conn == null){
+                conn = getConnection()
+            }
+            conn!!.createStatement().apply {
                 val rs = executeQuery("SELECT `id` FROM `matrix_db`.matrices")
                 while(rs.next()){
                     array.add(rs.getString("id"))
@@ -46,10 +51,13 @@ class Matrices : BaseRepository() {
     override fun createEntry(model: BaseModel) {
         val m = model as MatrixModel
         try{
-            val conn = getConnection()
-            conn.createStatement().apply {
+            if(conn == null){
+                conn = getConnection()
+            }
+            conn!!.createStatement().apply {
                 executeUpdate("INSERT INTO `matrix_db`.matrices " +
                         "VALUES ('${m.id}', '${m.rows}', '${m.columns}')")
+                close()
             }
         }catch (ignore: SQLException){
 
@@ -59,15 +67,17 @@ class Matrices : BaseRepository() {
     override fun getEntry(param: HyperParameter): BaseModel? {
         val p = param as MatrixId
         try{
-            val conn = getConnection()
-            conn.createStatement().apply {
+            if(conn == null){
+                conn = getConnection()
+            }
+            conn!!.createStatement().apply {
                 val rs = this.executeQuery("SELECT `id`, `matrix_rows`, `matrix_columns`" +
                         " FROM `matrix_db`.`matrices` WHERE `id` = '${p.id}'")
                 rs.next()
                 val id = rs.getString(1)
                 val rows = rs.getInt(2)
                 val columns = rs.getInt(3)
-                return MatrixModel(id, rows, columns)
+                return MatrixModel(id, rows, columns).also { this.close() }
             }
         }catch (ex: SQLException){
             return null
@@ -77,12 +87,15 @@ class Matrices : BaseRepository() {
     override fun updateEntry(model: BaseModel) {
         val m = model as MatrixModel
         try {
-            val conn = getConnection()
-            conn.createStatement().apply {
+            if(conn == null){
+                conn = getConnection()
+            }
+            conn!!.createStatement().apply {
                 executeUpdate("UPDATE `matrix_db`.matrices" +
                         " WHERE `id` = ${m.id} SET `matrix_rows`=${m.rows}")
                 executeUpdate("UPDATE `matrix_db`.matrices " +
                         "WHERE `id` = ${m.id} SET `matrix_columns`=${m.columns}")
+                close()
             }
         }catch (ignore: SQLException){
 

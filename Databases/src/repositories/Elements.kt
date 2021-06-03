@@ -6,9 +6,11 @@ import models.BaseModel
 import models.ElementModel
 import utils.params.HyperParameter
 import utils.params.Element
+import java.sql.Connection
 import java.sql.SQLException
 
 class Elements : BaseRepository() {
+    private var conn: Connection? = null
 
     fun getElement(matrixName: String, i: Int, j: Int) : Double?{
         val m = getEntry(Element(matrixName, i, j))
@@ -55,8 +57,10 @@ class Elements : BaseRepository() {
 
     fun getColumnsCount(matrixName: String, byRow: Int) : Int?{
         try{
-            val conn = getConnection()
-            conn.createStatement().apply {
+            if(conn == null){
+                conn = getConnection()
+            }
+            conn!!.createStatement().apply {
                 val rs = executeQuery("SELECT COUNT(`j`) AS count FROM `matrix_db`.matrix_elements " +
                             "WHERE `matrix_id` = '$matrixName' AND `i` = '$byRow'")
                 rs.next()
@@ -69,8 +73,10 @@ class Elements : BaseRepository() {
 
     fun getRowsCount(matrixName: String, byColumn: Int) : Int?{
         try{
-            val conn = getConnection()
-            conn.createStatement().apply {
+            if(conn == null){
+                conn = getConnection()
+            }
+            conn!!.createStatement().apply {
                 val rs = executeQuery("SELECT COUNT(`i`) AS count FROM `matrix_db`.matrix_elements " +
                             "WHERE `matrix_id` = '$matrixName' AND `j` = '$byColumn'")
                 rs.next()
@@ -84,8 +90,10 @@ class Elements : BaseRepository() {
     override fun createEntry(model: BaseModel) {
         val m = model as ElementModel
         try{
-            val conn = getConnection()
-            conn.createStatement().apply {
+            if(conn == null){
+                conn = getConnection()
+            }
+            conn!!.createStatement().apply {
                 executeUpdate("INSERT INTO `matrix_db`.matrix_elements " +
                         "VALUES ('${m.matrixId}', '${m.i}', '${m.j}', '${m.element}')")
             }
@@ -97,8 +105,10 @@ class Elements : BaseRepository() {
     override fun getEntry(param: HyperParameter): BaseModel? {
         val p = param as Element
         try{
-            val conn = getConnection()
-            conn.createStatement().apply {
+            if(conn == null){
+                conn = getConnection()
+            }
+            conn!!.createStatement().apply {
                 val rs = executeQuery("SELECT `element_value` FROM `matrix_db`.matrix_elements " +
                         "WHERE matrix_id = '${p.id}' AND i = '${p.row}' AND j = '${p.column}'")
                 rs.next()
@@ -113,8 +123,10 @@ class Elements : BaseRepository() {
     override fun updateEntry(model: BaseModel) {
         val m = model as ElementModel
         try {
-            val conn = getConnection()
-            conn.createStatement().apply {
+            if(conn == null){
+                conn = getConnection()
+            }
+            conn!!.createStatement().apply {
                 executeUpdate("UPDATE `matrix_db`.matrix_elements " +
                         "WHERE matrix_id = '${m.matrixId}' AND i = '${m.i}' AND j = '${m.j}'" +
                         " SET element_value = '${m.element}'")

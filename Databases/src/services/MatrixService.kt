@@ -3,6 +3,8 @@ package services
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonParser
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import repositories.Elements
 import repositories.Matrices
 import signals.SignalMatrixList
@@ -12,7 +14,7 @@ class MatrixService {
     private val elements = Elements()
     private val matrices = Matrices()
 
-    fun appendMatrix(signal: SignalNewMatrix){
+    fun appendMatrix(signal: SignalNewMatrix) = GlobalScope.async{
         val s = JsonParser.parseString(signal.fullMatrix).asJsonObject
         val ms = matrices.getAllMatrices()
         if(!ms.contains(s["id"])){

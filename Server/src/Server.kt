@@ -70,7 +70,7 @@ class Server(port: Int) : ClientAdapter, TaskAdapter{
         val s = services["matrices"] as MatrixService
         when(data.getType()){
             "NewMatrix" -> {
-                s.appendMatrix(data as SignalNewMatrix)
+                s.appendMatrix(data as SignalNewMatrix).await()
                 client.sendData(s.getMatrixList())
             }
             "Addition" -> {
@@ -192,6 +192,7 @@ class Server(port: Int) : ClientAdapter, TaskAdapter{
             if(connected.size == 1){
                 connected[connected.size - 1].apply {
                     if(!locked){
+                        println("[SERVER]: One query")
                         lock()
                         sendData(SignalSolve(taskId, getData(tp.task).toString()))
                         tp.addQuery()
@@ -206,6 +207,7 @@ class Server(port: Int) : ClientAdapter, TaskAdapter{
                             c.lock()
                             c.sendData(SignalSolve(taskId, getData(tp.task).toString()))
                             tp.addQuery()
+                            println("[SERVER]: $count/2 queries")
                             continue
                         }
                         break
